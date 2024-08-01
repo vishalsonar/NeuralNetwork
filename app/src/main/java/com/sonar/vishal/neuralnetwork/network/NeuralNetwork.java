@@ -1,6 +1,7 @@
 package com.sonar.vishal.neuralnetwork.network;
 
 import com.sonar.vishal.neuralnetwork.activationfunction.Linear;
+import com.sonar.vishal.neuralnetwork.enumeration.ActivationFunction;
 import com.sonar.vishal.neuralnetwork.interfaces.IActivationFunction;
 import com.sonar.vishal.neuralnetwork.layer.HiddenLayer;
 import com.sonar.vishal.neuralnetwork.layer.InputLayer;
@@ -34,13 +35,20 @@ public class NeuralNetwork {
         this.output = output;
     }
 
+    public NeuralNetwork(int numberOfInputs, int numberOfOutputs, IActivationFunction outputActivationFunction) {
+        this(numberOfInputs, numberOfOutputs, new int[]{}, new IActivationFunction[]{}, outputActivationFunction);
+    }
+
     public NeuralNetwork(int numberOfInputs, int numberOfOutputs, int[] numberOfHiddenNeurons, IActivationFunction[] hiddenActivationFunction, IActivationFunction outputActivationFunction) {
         this.input = new ArrayList<>(numberOfInputs);
         this.output = new ArrayList<>(numberOfOutputs);
         this.numberOfHiddenLayers = numberOfHiddenNeurons.length;
-
         this.inputLayer = new InputLayer(numberOfInputs);
-        this.outputLayer = new OutputLayer(numberOfOutputs, outputActivationFunction, numberOfHiddenNeurons[this.numberOfHiddenLayers - 1]);
+        if (numberOfHiddenLayers == 0) {
+            this.outputLayer = new OutputLayer(numberOfOutputs, outputActivationFunction, numberOfInputs);
+        } else {
+            this.outputLayer = new OutputLayer(numberOfOutputs, outputActivationFunction, numberOfHiddenNeurons[this.numberOfHiddenLayers - 1]);
+        }
 
         HiddenLayer hiddenLayer = null;
         HiddenLayer previousHiddenLayer = null;
@@ -101,7 +109,7 @@ public class NeuralNetwork {
 
     public static void main(String[] a) {
         int[] numberOfNeurons = {3};
-        IActivationFunction[] hiddenActivationFunction = {IActivationFunction.getFunction(IActivationFunction.NAME.SIGMOD, 1.0)};
+        IActivationFunction[] hiddenActivationFunction = {IActivationFunction.getFunction(ActivationFunction.SIGMOD, 1.0)};
         NeuralNetwork neuralNetwork = new NeuralNetwork(2, 1, numberOfNeurons, hiddenActivationFunction, new Linear(1.0));
 
         neuralNetwork.setInput(new ArrayList<Double>(Arrays.asList(1.5, 0.5)));
